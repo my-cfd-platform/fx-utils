@@ -7,7 +7,7 @@ edition = "2021"
 
 [features]
 default = []
-isolated-margin = ["my-nosql-contracts/isolated-margin"]
+
 
 [dependencies]
 service-sdk = { tag = "0.2.5", git = "https://github.com/MyJetTools/service-sdk.git", features = [
@@ -15,4 +15,5 @@ service-sdk = { tag = "0.2.5", git = "https://github.com/MyJetTools/service-sdk.
     "my-nosql-sdk",
 ] }
 
-my-nosql-contracts = { tag = "0.1.34", git = "https://github.com/my-cfd-platform/my-nosql-contracts.git" }
+my-nosql-contracts = { tag = "0.1.37", git = "https://github.com/my-cfd-platform/my-nosql-contracts.git" }
+async-trait = "*"
