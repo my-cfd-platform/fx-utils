@@ -10,13 +10,6 @@ pub enum MarkupCalculatorError {
 
 #[async_trait::async_trait]
 pub trait IMarkupCalculator {
-    async fn resolve_group_id(
-        &self,
-        trader_id: String,
-        account_id: String,
-        my_telemetry: &MyTelemetryContext,
-    ) -> Option<String>;
-
     async fn get_markup_profile_id(&self, group_id: &str) -> Option<String>;
 
     async fn get_markup_profile(
