@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use my_nosql_contracts::MarkupProfileNoSqlEntity;
 
 use super::*;
@@ -11,8 +13,10 @@ pub enum MarkupCalculatorError {
 pub trait IMarkupCalculator {
     async fn get_markup_profile_id(&self, group_id: &str) -> Option<String>;
 
-    async fn get_markup_profile(&self, markup_profile_id: &str)
-        -> Option<MarkupProfileNoSqlEntity>;
+    async fn get_markup_profile(
+        &self,
+        markup_profile_id: &str,
+    ) -> Option<Arc<MarkupProfileNoSqlEntity>>;
 
     async fn get_instrument_digits(&self, instrument_id: &str) -> Option<u32>;
 
