@@ -15,5 +15,6 @@ service-sdk = { tag = "0.2.6", git = "https://github.com/MyJetTools/service-sdk.
     "my-nosql-sdk",
 ] }
 
-my-nosql-contracts = { tag = "0.1.46", git = "https://github.com/my-cfd-platform/my-nosql-contracts.git" }
+my-nosql-contracts = { tag = "0.1.51", git = "https://github.com/my-cfd-platform/my-nosql-contracts.git" }
 async-trait = "*"
+rust_decimal = "*"
