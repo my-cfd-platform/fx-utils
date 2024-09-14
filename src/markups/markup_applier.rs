@@ -43,6 +43,12 @@ impl MarkupApplier {
     }
 }
 
+pub fn calculate_spread(bid: f64, ask: f64, digits: u32) -> Decimal {
+    let bid = Decimal::from_f64(bid).unwrap();
+    let ask = Decimal::from_f64(ask).unwrap();
+    (ask - bid).round_dp_with_strategy(digits, RoundingStrategy::ToZero)
+}
+
 pub fn get_max_spread(
     bid: f64,
     ask: f64,
@@ -51,17 +57,23 @@ pub fn get_max_spread(
     pip: f64,
     digits: u32,
 ) -> Option<(f64, f64)> {
-    let bid = Decimal::from_f64(bid).unwrap();
-    let ask = Decimal::from_f64(ask).unwrap();
-    let pip = Decimal::from_f64(pip).unwrap();
-    let spread = ask - bid;
+    let spread = calculate_spread(bid, ask, digits);
     let max_spread = Decimal::from_f64(max_spread).unwrap();
 
     if max_spread < spread {
-        let is_odd = (spread.round_dp(digits).to_f64().unwrap() * asset_factor) as i32 % 2 == 0;
-        let spread_diff = spread - max_spread;
+        let spread_diff =
+            (spread - max_spread).round_dp_with_strategy(digits, RoundingStrategy::ToZero);
+
         let spread_rounded = (spread_diff / Decimal::from_f64(2.0).unwrap())
             .round_dp_with_strategy(digits, RoundingStrategy::ToZero);
+
+        let spread_rounded = spread_rounded.to_f64().unwrap();
+
+        let is_odd: bool = (spread_diff * Decimal::from_f64(asset_factor).unwrap())
+            .to_i32()
+            .unwrap()
+            % 2
+            == 0;
 
         if is_odd {
             return Some((
@@ -87,17 +99,21 @@ pub fn get_min_spread(
     pip: f64,
     digits: u32,
 ) -> Option<(f64, f64)> {
-    let bid = Decimal::from_f64(bid).unwrap();
-    let ask = Decimal::from_f64(ask).unwrap();
-    let pip = Decimal::from_f64(pip).unwrap();
-    let spread = ask - bid;
+    let spread = calculate_spread(bid, ask, digits);
     let min_spread = Decimal::from_f64(min_spread).unwrap();
 
     if spread < min_spread {
-        let is_odd = (spread.round_dp(digits).to_f64().unwrap() * asset_factor) as i32 % 2 == 0;
-        let spread_diff = min_spread - spread;
+        let spread_diff =
+            (min_spread - spread).round_dp_with_strategy(digits, RoundingStrategy::ToZero);
         let spread_rounded = (spread_diff / Decimal::from_f64(2.0).unwrap())
             .round_dp_with_strategy(digits, RoundingStrategy::ToZero);
+
+        let spread_rounded = spread_rounded.to_f64().unwrap();
+        let is_odd: bool = (spread_diff * Decimal::from_f64(asset_factor).unwrap())
+            .to_i32()
+            .unwrap()
+            % 2
+            == 0;
 
         if is_odd {
             return Some((
@@ -185,7 +201,6 @@ mod tests {
 
     #[test]
     fn test_max_zero() {
-
         let (bid, ask) = get_max_spread(
             1.23434,
             1.23436,
@@ -193,7 +208,8 @@ mod tests {
             10_f64.powi(5),
             1.0 / 10_f64.powi(5),
             5,
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(format!("{:.5}", bid), "1.23435");
         assert_eq!(format!("{:.5}", ask), "1.23435");
