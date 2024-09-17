@@ -34,19 +34,45 @@ impl MarkupApplier {
         }
     }
 
-    pub fn apply_min_max_spread(&self, price: f64, is_bid: bool) -> f64 {
-        if is_bid {
-            price + self.delta_bid
-        } else {
-            price + self.delta_ask
+    pub fn apply_min_max_spread(&self, bid: f64, ask: f64) -> (f64, f64) {
+        let mut current_bid_ask = (bid, ask);
+
+        if let Some(max_spread) = self.max_spread {
+            if let Some((bid, ask)) = get_max_spread(
+                current_bid_ask.0,
+                current_bid_ask.1,
+                max_spread,
+                self.factor,
+                self.pip,
+                self.digits,
+            ) {
+                current_bid_ask = (bid, ask);
+            }
         }
+
+        if let Some(min_spread) = self.min_spread {
+            if let Some((bid, ask)) = get_min_spread(
+                current_bid_ask.0,
+                current_bid_ask.1,
+                min_spread,
+                self.factor,
+                self.pip,
+                self.digits,
+            ) {
+                current_bid_ask = (bid, ask);
+            }
+        }
+
+        current_bid_ask
     }
 }
 
 pub fn calculate_spread(bid: f64, ask: f64, digits: u32) -> Decimal {
     let bid = Decimal::from_f64(bid).unwrap();
     let ask = Decimal::from_f64(ask).unwrap();
-    (ask - bid).round_dp_with_strategy(digits, RoundingStrategy::ToZero)
+    (ask - bid)
+        .round_dp_with_strategy(digits, RoundingStrategy::ToZero)
+        .abs()
 }
 
 pub fn get_max_spread(
