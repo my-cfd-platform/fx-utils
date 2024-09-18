@@ -72,7 +72,6 @@ pub fn calculate_spread(bid: f64, ask: f64, digits: u32) -> Decimal {
     let ask = Decimal::from_f64(ask).unwrap();
     (ask - bid)
         .round_dp_with_strategy(digits, RoundingStrategy::ToZero)
-        .abs()
 }
 
 pub fn get_max_spread(
